@@ -49,7 +49,7 @@ public class BbsDAO {
 		}
 		return -1; // 데이터베이스 오류
 	}
-
+	//글 생성
 	public int write(String bbsTitle, String userID, String bbsContent, String strDate) {
 		String SQL = "INSERT INTO bbs VALUES(?,?,?,TO_DATE(?,'yyyy/mm/dd hh24:mi:ss'),?,?)";
 		try {
@@ -68,7 +68,9 @@ public class BbsDAO {
 		}
 		return -1; // 데이터베이스 오류
 	}
-	public ArrayList<Bbs> getList(int pageNumber){   //게시판 리스트 출력
+	
+	//게시판 리스트 출력
+	public ArrayList<Bbs> getList(int pageNumber){   
 		String SQL = "SELECT * FROM(SELECT * FROM bbs WHERE bbsID < ? AND bbsAvailable = 1 ORDER BY bbsID DESC) WHERE ROWNUM <= 10";
 		ArrayList<Bbs> list = new ArrayList<Bbs>();
 		try {
@@ -93,8 +95,8 @@ public class BbsDAO {
 		}
 		return list; 
 	}
-	
-	public boolean nextPage(int pageNumber) {  //페이징 처리
+	//페이징 처리
+	public boolean nextPage(int pageNumber) {  
 		String SQL = "SELECT * FROM bbs WHERE bbsID < ? AND bbsAvailable = 1 ";
 		try {
 			PreparedStatement pstmt = conn.prepareStatement(SQL);
@@ -134,18 +136,32 @@ public class BbsDAO {
 		}
 		return null; 
 	}
-	public int delete(int bbsID, String userID) {
-		String SQL = "DELETE TABLE bbs WHERE bbsID=? AND userID=?";
+	//글 삭제
+	public int delete(int bbsID) { 
+		String SQL = "UPDATE BBS SET bbsAvailable = 0 WHERE bbsID = ?";
 		try {
 			PreparedStatement pstmt = conn.prepareStatement(SQL);
 			pstmt.setInt(1, bbsID);
-			pstmt.setString(2, userID);
-			return 1;
+			return pstmt.executeUpdate();
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
 		}
 		return -1;
 	}
-	
+	//글 업데이트
+	public int update(int bbsID ,String bbsTitle, String bbsContent) {
+		String SQL = "UPDATE BBS SET bbsTitle = ?, bbsContent = ? WHERE bbsID = ?" ; 	
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(SQL);
+			pstmt.setString(1, bbsTitle);
+			pstmt.setString(2, bbsContent);
+			pstmt.setInt(3, bbsID);
+			return pstmt.executeUpdate();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		return -1; // 데이터베이스 오류
+	}
 }
